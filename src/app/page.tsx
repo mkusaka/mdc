@@ -2,6 +2,7 @@ import { JSDOM } from "jsdom";
 import { Readability } from "@mozilla/readability";
 import TurndownService from "turndown";
 import { ExtractResult } from "./types";
+import { MarkdownView } from "./components/MarkdownView";
 
 async function extractContent(url: string): Promise<ExtractResult> {
   const response = await fetch(url);
@@ -20,10 +21,11 @@ async function extractContent(url: string): Promise<ExtractResult> {
 
   const turndownService = new TurndownService();
   const markdown = turndownService.turndown(article.content);
+  const markdownWithTitle = article.title ? `# ${article.title}\n\n${markdown}` : markdown;
 
   return {
     title: article.title,
-    markdown,
+    markdown: markdownWithTitle,
     excerpt: article.excerpt,
   };
 }
@@ -99,16 +101,7 @@ export default async function Home({
                 </div>
               )}
 
-              {result.markdown && (
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                    Markdown
-                  </h2>
-                  <pre className="p-4 bg-gray-50 rounded-lg overflow-auto text-gray-700 font-mono text-sm whitespace-pre-wrap">
-                    {result.markdown}
-                  </pre>
-                </div>
-              )}
+              {result.markdown && <MarkdownView markdown={result.markdown} />}
             </div>
           )}
         </div>
