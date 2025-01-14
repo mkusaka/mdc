@@ -31,14 +31,16 @@ async function extractContent(url: string): Promise<ExtractResult> {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { url?: string };
+  searchParams: Promise<{ url?: string }>;
 }) {
+  const params = await searchParams;
+  const url = params?.url;
   let result: ExtractResult | null = null;
   let error: string | null = null;
 
-  if (searchParams.url) {
+  if (url) {
     try {
-      result = await extractContent(searchParams.url);
+      result = await extractContent(url);
     } catch (err) {
       error = err instanceof Error ? err.message : "エラーが発生しました";
     }
@@ -56,7 +58,7 @@ export default async function Home({
               <input
                 type="url"
                 name="url"
-                defaultValue={searchParams.url}
+                defaultValue={url}
                 placeholder="URLを入力してください"
                 required
                 className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
